@@ -1,0 +1,8 @@
+.env
+__pycache__/
+*.pyc
+.vscode/
+tempCodeRunnerFile.py
+memory.json
+gemini_client.py
+test
