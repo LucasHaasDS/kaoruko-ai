@@ -4,7 +4,7 @@ import time
 import keyboard
 from PIL import Image, ImageTk
 
-from gemini_client import KaorukoAI
+from OllamaAI import KaorukoAI
 from ChatBubble import ChatBubble
 from ContextMenu import ContextMenu
 from ChatLog import ChatLog
