@@ -1,6 +1,4 @@
-import os
 import tkinter as tk
-import time
 import keyboard
 from PIL import Image, ImageTk
 
@@ -62,14 +60,9 @@ class KaorukoApp:
         self.canvas.pack()
         self.canvas.create_image(0, 0, image=self.image, anchor="nw")
 
-        self.offset_x = 0
-        self.offset_y = 0
-        self.dragging = False
-        self.drag_start_time = time.time()
-
-        self.root.bind("<Button-3>", self.on_right_click)
-        self.root.bind("<B3-Motion>", self.on_right_drag)
-        self.root.bind("<ButtonRelease-3>", self.on_right_release)
+        self.root.bind("<Button-3>", self.drag_controller.on_right_click)
+        self.root.bind("<B3-Motion>", self.drag_controller.on_right_drag)
+        self.root.bind("<ButtonRelease-3>", self.drag_controller.on_right_release)
 
         keyboard.add_hotkey(
             "ctrl+space", 

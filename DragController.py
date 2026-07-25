@@ -21,9 +21,9 @@ class DragController:
         x = event.x_root - self.offset_x
         y = event.y_root - self.offset_y
         self.root.geometry(f"+{x}+{y}")
-        self.chat_box.update_position()
+        self.on_move()
 
     def on_right_release(self, event):
         elapsed = time.time() - self.drag_start_time
         if not self.dragging and elapsed < 0.2:
-            self.context_menu.show_context_menu(event)
+            self.on_context_menu(event)

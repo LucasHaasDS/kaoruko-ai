@@ -3,6 +3,7 @@ import tkinter as tk
 import textwrap
 from AI_config import USER_NAME, SYSTEM_PROMPT, BG_COLOR, USER_BUBBLE_COLOR, AI_BUBBLE_COLOR, BUBBLE_TEXT_COLOR, INPUT_COLOR
 from PIL import Image, ImageTk, ImageDraw, ImageFont
+from MessageBubble import MessageBubble
 
 class ChatLog:
     def __init__(self, root, on_send):
@@ -77,32 +78,32 @@ class ChatLog:
         self.log_window.withdraw()
 
     def add_message(self, sender, message):
-        line_height = 20
-        font = ImageFont.truetype("arial.ttf", 16)
-        color = USER_BUBBLE_COLOR if sender == "Lucas" else AI_BUBBLE_COLOR
-        lines = textwrap.wrap(message, width=67)
-        temp = ImageDraw.Draw(Image.new("RGBA", (1, 1)))
-        max_width = max(temp.textbbox((0, 0), line, font=font)[2] for line in lines)
-        bubble_width = max_width + 40
-        bubble_height = (len(lines) * line_height) + 30
-        bubble_img = Image.new("RGBA", (bubble_width, bubble_height), (0, 0, 0, 0))
-        draw = ImageDraw.Draw(bubble_img)
-        draw.rounded_rectangle([0, 0, bubble_width, bubble_height], radius=15, fill=color)
-        y_position = 15
-        for line in lines:
-            draw.text((20, y_position), line, fill="black", font=font)
-            y_position += line_height
-        self.bubble_tk = ImageTk.PhotoImage(bubble_img)
-        self.bubble_images.append(self.bubble_tk)   
+        bubble = MessageBubble(sender, message)
+
+        image, width, height = bubble.create_bubble()
+
+        self.bubble_images.append(image)
+
         canvas_width = self.chat_canvas.winfo_width()
-        if sender == "Lucas":
-            x = canvas_width - bubble_width - 20
+
+        if sender == USER_NAME:
+            x = canvas_width - width - 20
         else:
             x = 20
 
-        self.chat_canvas.create_image(x, self.chat_y_position, image=self.bubble_tk, anchor="nw")
-        self.chat_y_position += bubble_height + 40
-        self.chat_canvas.configure(scrollregion=self.chat_canvas.bbox("all"))
+        self.chat_canvas.create_image(
+            x,
+            self.chat_y_position,
+            image=image,
+            anchor="nw"
+        )
+
+        self.chat_y_position += height + 40
+
+        self.chat_canvas.configure(
+            scrollregion=self.chat_canvas.bbox("all")
+        )
+
         self.chat_canvas.yview_moveto(1.0)
 
     def toggle_chat_log(self):
