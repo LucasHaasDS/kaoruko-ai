@@ -8,6 +8,8 @@ from ContextMenu import ContextMenu
 from ChatLog import ChatLog
 from ChatBox import ChatBox
 from DragController import DragController
+from memory import MemoryManager
+from SessionWindow import SessionWindow
 
 
 class KaorukoApp:
@@ -25,11 +27,15 @@ class KaorukoApp:
 
         self.ai = KaorukoAI()
         self.bubble = ChatBubble(root)
+        self.memory = MemoryManager()
 
         self.chat_log = ChatLog(
             self.root,
             on_send=self.send_message
         )
+
+        messages = self.ai.get_current_session_messages()
+        self.chat_log.load_messages(messages) 
         
         self.chat_box = ChatBox(
             self.root,
@@ -46,7 +52,6 @@ class KaorukoApp:
             on_context_menu=self.context_menu.show_context_menu,
             on_move=self.chat_box.update_position
         )
-
         self.root.overrideredirect(True)
         self.root.attributes("-topmost", True)
         self.root.attributes("-transparentcolor", "#010101")
@@ -64,6 +69,12 @@ class KaorukoApp:
         self.root.bind("<B3-Motion>", self.drag_controller.on_right_drag)
         self.root.bind("<ButtonRelease-3>", self.drag_controller.on_right_release)
 
+        self.session_window = SessionWindow(
+            self.root,
+            self.ai,
+            self.switch_session
+        )
+
         keyboard.add_hotkey(
             "ctrl+space", 
             self.chat_box.toggle_window
@@ -73,16 +84,28 @@ class KaorukoApp:
             self.chat_log.toggle_chat_log
         )
 
+        keyboard.add_hotkey(
+            "ctrl+alt+shift",
+            self.session_window.show
+        )
+
     def send_message(self, message):
-        self.chat_log.add_message("Lucas", message)
+        self.chat_log.add_message("Lucas", message, "user")
 
         self.ai.chat_async(
             message,
-            self.on_response
+            self.on_response  
         )
 
-    def on_response(self, response):
-        self.chat_log.add_message("Kaoruko", response)
+    def on_response(self, response):   
+        self.chat_log.add_message("Kaoruko", response, "assistant")
+        
+
+    def switch_session(self, session_id):
+        messages = self.ai.load_session(session_id)
+        self.chat_log.load_messages(messages)
+
+
 
 root = tk.Tk()
 app = KaorukoApp(root)
