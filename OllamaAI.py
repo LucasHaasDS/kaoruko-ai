@@ -1,8 +1,18 @@
+from webbrowser import get
 import ollama
 import threading
 from AI_config import USER_NAME, SYSTEM_PROMPT
 from memory import MemoryManager
-from database import create_database, create_session, add_message, get_messages, get_latest_session, get_sessions
+from database import (
+    create_database, 
+    create_session, 
+    add_message, 
+    get_messages, 
+    get_latest_session, 
+    get_sessions, 
+    rename_session,
+    get_session_title
+)
 
 class KaorukoAI:
     def __init__(self):
@@ -50,7 +60,16 @@ class KaorukoAI:
                 self.session_id,
                 "assistant",
                 reply
-            )
+            ) 
+
+            title = get_session_title(self.session_id)
+
+            if title == "New Conversation":
+                
+                new_title = self.update_session_title()
+
+                print(f"Conversation renamed to: {new_title}")
+
             return reply
         except Exception as e:
             return f"[Error occurred: {e}]"
@@ -121,3 +140,38 @@ class KaorukoAI:
             (role, content)
             for role, content, timestamp in saved_messages
         ]
+    
+    def generate_session_title(self):
+
+        conversation = self.messages[1:]
+
+        prompt = f"""
+        Generate a short title for this conversation.
+
+        Rules:
+        - Use 3 to 6 words.
+        - Describe the main topic.
+        - Return only the title.
+        - Do not use quotation marks.
+
+        Conversation:
+        {conversation}
+        """
+        response = ollama.chat(
+            model="llama3.2",
+            messages=[
+                {
+                    "role": "user",
+                    "content": prompt
+                }
+            ]
+        )
+
+        title = response["message"]["content"].strip()
+        return title
+
+    def update_session_title(self):
+        title = self.generate_session_title()
+        rename_session(self.session_id, title)
+        
+        return

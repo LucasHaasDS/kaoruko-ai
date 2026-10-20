@@ -67,7 +67,7 @@ class KaorukoApp:
 
         self.root.bind("<Button-3>", self.drag_controller.on_right_click)
         self.root.bind("<B3-Motion>", self.drag_controller.on_right_drag)
-        self.root.bind("<ButtonRelease-3>", self.drag_controller.on_right_release)
+        self.root.bind("<ButtonRelease-3>", self.drag_controller.on_right_release)  
 
         self.session_window = SessionWindow(
             self.root,
@@ -109,4 +109,4 @@ class KaorukoApp:
 
 root = tk.Tk()
 app = KaorukoApp(root)
-root.mainloop()
+root.mainloop() 

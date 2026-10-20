@@ -138,3 +138,40 @@ def update_session_activity(session_id):
 
     connection.commit()
     connection.close()
+
+def rename_session(session_id, new_title):
+
+    connection = sqlite3.connect("kaoruko.db")
+    connection.execute(
+        """
+        UPDATE sessions
+        SET title = ?
+        WHERE id = ?
+        """,
+        (new_title, session_id)
+    )
+
+    connection.commit()
+    connection.close()
+
+def get_session_title(session_id):
+
+    connection = sqlite3.connect("kaoruko.db")
+
+    cursor = connection.execute(
+        """
+        SELECT title
+        FROM sessions
+        WHERE id = ?
+        """,
+        (session_id,)
+    )
+
+    result = cursor.fetchone()
+
+    connection.close()
+    
+    if result is None:
+        return None
+    
+    return result[0]

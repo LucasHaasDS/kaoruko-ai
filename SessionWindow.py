@@ -26,9 +26,18 @@ class SessionWindow:
             self.close
         )
 
-        sessions = self.ai.get_all_sessions()
+        new_conversation_button = tk.Button(
+            self.window,
+            text="+ New Conversation",
+            command=self.create_new_conversation
+        )
+        new_conversation_button.pack(
+            fill="x",
+            padx=10,
+            pady=10
+        )
 
-        print("Sessions:", sessions)
+        sessions = self.ai.get_all_sessions()
 
         for session_id, title, created_at, last_active in sessions:
 
@@ -36,7 +45,7 @@ class SessionWindow:
                 self.window,
                 text=title,
                 command=lambda session_id=session_id:
-                self.on_select_session(session_id)
+                self.select_session(session_id)
             )
 
             button.pack(
@@ -54,3 +63,8 @@ class SessionWindow:
 
         self.window.destroy()
         self.window = None
+
+    def create_new_conversation(self):
+        self.ai.new_session("New Conversation")
+        self.on_select_session(self.ai.session_id)
+        self.close()
